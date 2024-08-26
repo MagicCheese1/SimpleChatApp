@@ -1,5 +1,7 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
+import json
+import datetime
 
 app = FastAPI()
 
@@ -27,6 +29,15 @@ manager = ConnectionManager()
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
+        await manager.broadcast(
+            json.dumps(
+                {
+                    "author": "System",
+                    "timestamp": str(datetime.datetime.now()),
+                    "message": "A new user has connected",
+                }
+            )
+        )
         while True:
             data = await websocket.receive_text()
             await manager.broadcast(data)
