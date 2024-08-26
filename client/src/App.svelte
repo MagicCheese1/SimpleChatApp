@@ -16,7 +16,7 @@
         ...messages,
         {
           author: rec.author,
-          timestamp: rec.timestamp,
+          timestamp: new Date(rec.timestamp).toLocaleString(),
           message: rec.message,
         },
       ];
@@ -33,7 +33,7 @@
       JSON.stringify({
         author: username,
         message: message,
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now(),
       })
     );
     message = "";
