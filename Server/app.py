@@ -33,7 +33,7 @@ async def websocket_endpoint(websocket: WebSocket):
             json.dumps(
                 {
                     "author": "System",
-                    "timestamp": str(datetime.datetime.now()),
+                    "timestamp": str(datetime.datetime.today().isoformat()),
                     "message": "A new user has connected",
                 }
             )

@@ -6,14 +6,51 @@
   let socket;
 
   onMount(() => {
-    socket = new WebSocket("ws://localhost:8000/chat");
+    socket = new WebSocket("ws://localhost:8000/ws");
     socket.addEventListener("open", () => {
       console.log("Opened");
     });
+    socket.onmessage = (event) => {
+      let rec = JSON.parse(event.data);
+      messages = [
+        ...messages,
+        {
+          author: rec.author,
+          timestamp: rec.timestamp,
+          message: rec.message,
+        },
+      ];
+    };
   });
 
-  function send_message() {}
+  let message = "";
+  let username = "";
+
+  function send_message() {
+    if (!message) return;
+    if (!username) return;
+    socket.send(
+      JSON.stringify({
+        author: username,
+        message: message,
+        timestamp: new Date().toISOString(),
+      })
+    );
+    message = "";
+  }
+  function on_key_down(event) {
+    if (event.repeat) return;
+
+    switch (event.key) {
+      case "Enter":
+        send_message();
+        event.preventDefault();
+        break;
+    }
+  }
 </script>
+
+<svelte:window on:keydown={on_key_down} />
 
 <div class="wrapper">
   <div class="head">
@@ -35,9 +72,19 @@
       {/each}
     </div>
     <div class="inputwrapper">
-      <input type="text" class="username someInput" placeholder="username" />
-      <input type="text" class="MessageInput someInput" placeholder="message" />
-      <button class="sendButton someInput">SEND</button>
+      <input
+        type="text"
+        class="username someInput"
+        placeholder="username"
+        bind:value={username}
+      />
+      <input
+        type="text"
+        class="MessageInput someInput"
+        placeholder="message"
+        bind:value={message}
+      />
+      <button class="sendButton someInput" on:click={send_message}>SEND</button>
     </div>
   </div>
 </div>
